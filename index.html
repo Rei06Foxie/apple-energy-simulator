@@ -1,2 +1,231 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍎 Falling Apple Energy Simulator</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(#87CEEB,#E8F8FF);
+    text-align:center;
+}
+
+h1{
+    color:#2c3e50;
+}
+
+.container{
+    display:flex;
+    justify-content:center;
+    gap:30px;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+.scene{
+    width:300px;
+    height:500px;
+    background:white;
+    border-radius:20px;
+    position:relative;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    overflow:hidden;
+}
+
+.tree{
+    position:absolute;
+    bottom:0;
+    left:60px;
+    font-size:180px;
+}
+
+.apple{
+    position:absolute;
+    left:175px;
+    top:50px;
+    font-size:40px;
+}
+
+.panel{
+    width:320px;
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+button{
+    background:#4CAF50;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.bar{
+    background:#ddd;
+    height:20px;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:5px;
+}
+
+.fill{
+    height:100%;
+    width:100%;
+}
+
+.ep{
+    background:#4CAF50;
+}
+
+.ek{
+    background:#FF9800;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🍎 Falling Apple Energy Simulator</h1>
+
+<p>
+Amati perubahan Energi Potensial dan Energi Kinetik saat apel jatuh.
+</p>
+
+<div class="container">
+
+<div class="scene">
+<div class="tree">🌳</div>
+<div class="apple" id="apple">🍎</div>
+</div>
+
+<div class="panel">
+
+<h3>Pengaturan</h3>
+
+<p>
+Massa: <span id="massValue">2</span> kg
+</p>
+
+<input type="range" id="mass" min="1" max="10" value="2">
+
+<p>
+Ketinggian: <span id="heightValue">10</span> m
+</p>
+
+<input type="range" id="height" min="5" max="20" value="10">
+
+<br><br>
+
+<button onclick="startFall()">
+🍎 Jatuhkan Apel
+</button>
+
+<hr>
+
+<h3>Energi Potensial</h3>
+
+<div class="bar">
+<div class="fill ep" id="epBar"></div>
+</div>
+
+<p id="epText">0 J</p>
+
+<h3>Energi Kinetik</h3>
+
+<div class="bar">
+<div class="fill ek" id="ekBar"></div>
+</div>
+
+<p id="ekText">0 J</p>
+
+<hr>
+
+<h3>Energi Mekanik</h3>
+
+<p id="emText">0 J</p>
+
+</div>
+
+</div>
+
+<script>
+
+const apple = document.getElementById("apple");
+
+const massSlider = document.getElementById("mass");
+const heightSlider = document.getElementById("height");
+
+const massValue = document.getElementById("massValue");
+const heightValue = document.getElementById("heightValue");
+
+const epText = document.getElementById("epText");
+const ekText = document.getElementById("ekText");
+const emText = document.getElementById("emText");
+
+const epBar = document.getElementById("epBar");
+const ekBar = document.getElementById("ekBar");
+
+massSlider.oninput = () => {
+    massValue.innerText = massSlider.value;
+};
+
+heightSlider.oninput = () => {
+    heightValue.innerText = heightSlider.value;
+};
+
+function startFall(){
+
+    let m = parseFloat(massSlider.value);
+    let h = parseFloat(heightSlider.value);
+
+    let g = 10;
+
+    let totalEnergy = m * g * h;
+
+    let pos = 0;
+    let maxPos = 350;
+
+    apple.style.top = "50px";
+
+    let animation = setInterval(() => {
+
+        pos += 4;
+
+        let ratio = pos / maxPos;
+
+        if(ratio > 1) ratio = 1;
+
+        let ep = totalEnergy * (1 - ratio);
+        let ek = totalEnergy - ep;
+
+        epText.innerHTML = ep.toFixed(1) + " J";
+        ekText.innerHTML = ek.toFixed(1) + " J";
+        emText.innerHTML = totalEnergy.toFixed(1) + " J";
+
+        epBar.style.width = (ep/totalEnergy*100) + "%";
+        ekBar.style.width = (ek/totalEnergy*100) + "%";
+
+        apple.style.top = (50 + pos) + "px";
+
+        if(pos >= maxPos){
+            clearInterval(animation);
+        }
+
+    },30);
+
+}
+</script>
+
+</body>
+</html>
