@@ -2,158 +2,214 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍎 Falling Apple Energy Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🍎 Falling Apple Simulator v2</title>
 
 <style>
+
 body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(#87CEEB,#E8F8FF);
-    text-align:center;
+margin:0;
+font-family:Segoe UI,sans-serif;
+background:linear-gradient(to bottom,#87CEEB,#EAF8FF);
+text-align:center;
 }
 
 h1{
-    color:#2c3e50;
-}
-
-.container{
-    display:flex;
-    justify-content:center;
-    gap:30px;
-    flex-wrap:wrap;
-    margin-top:20px;
+margin-top:20px;
 }
 
 .scene{
-    width:300px;
-    height:500px;
-    background:white;
-    border-radius:20px;
-    position:relative;
-    box-shadow:0 4px 12px rgba(0,0,0,0.2);
-    overflow:hidden;
+width:400px;
+height:500px;
+margin:auto;
+position:relative;
+background:white;
+border-radius:20px;
+overflow:hidden;
+box-shadow:0 5px 20px rgba(0,0,0,0.15);
+}
+
+.cloud{
+position:absolute;
+font-size:40px;
+animation:cloudMove 25s linear infinite;
+}
+
+@keyframes cloudMove{
+from{left:-100px;}
+to{left:420px;}
 }
 
 .tree{
-    position:absolute;
-    bottom:0;
-    left:60px;
-    font-size:180px;
+position:absolute;
+bottom:0;
+left:60px;
+font-size:200px;
 }
 
 .apple{
-    position:absolute;
-    left:175px;
-    top:50px;
-    font-size:40px;
+position:absolute;
+left:240px;
+top:50px;
+font-size:45px;
 }
 
-.panel{
-    width:320px;
-    background:white;
-    padding:20px;
-    border-radius:20px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+.controls{
+margin:20px;
 }
 
 button{
-    background:#4CAF50;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:16px;
+padding:10px 18px;
+margin:5px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:16px;
 }
 
-button:hover{
-    opacity:0.9;
+.play{background:#4CAF50;color:white;}
+.pause{background:#FF9800;color:white;}
+.reset{background:#f44336;color:white;}
+.step{background:#2196F3;color:white;}
+
+.panel{
+max-width:700px;
+margin:20px auto;
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,0.15);
 }
 
-.bar{
-    background:#ddd;
-    height:20px;
-    border-radius:10px;
-    overflow:hidden;
-    margin-bottom:5px;
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
 }
 
-.fill{
-    height:100%;
-    width:100%;
+th,td{
+border:1px solid #ddd;
+padding:10px;
 }
 
-.ep{
-    background:#4CAF50;
+.status{
+font-size:22px;
+font-weight:bold;
+margin:15px;
 }
 
-.ek{
-    background:#FF9800;
+.explain{
+background:#FFF9C4;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
 }
+
+.slider{
+width:250px;
+}
+
 </style>
 </head>
 
 <body>
 
-<h1>🍎 Falling Apple Energy Simulator</h1>
+<h1>🍎 Falling Apple Simulator v2</h1>
 
 <p>
-Amati perubahan Energi Potensial dan Energi Kinetik saat apel jatuh.
+Energi Potensial ➜ Energi Kinetik
 </p>
 
-<div class="container">
+<div>
+
+Massa:
+<span id="massLabel">2</span> kg
+
+<br>
+
+<input class="slider"
+type="range"
+min="1"
+max="10"
+value="2"
+id="mass">
+
+<br><br>
+
+Ketinggian:
+<span id="heightLabel">10</span> m
+
+<br>
+
+<input class="slider"
+type="range"
+min="5"
+max="20"
+value="10"
+id="height">
+
+</div>
+
+<br>
 
 <div class="scene">
+
+<div class="cloud">☁️</div>
+
 <div class="tree">🌳</div>
-<div class="apple" id="apple">🍎</div>
+
+<div id="apple" class="apple">🍎</div>
+
+</div>
+
+<div class="controls">
+
+<button class="play" onclick="playSim()">▶ Play</button>
+
+<button class="pause" onclick="pauseSim()">⏸ Pause</button>
+
+<button class="step" onclick="stepSim()">⏭ Step</button>
+
+<button class="reset" onclick="resetSim()">🔄 Reset</button>
+
+</div>
+
+<div class="status" id="status">
+Posisi: Atas
 </div>
 
 <div class="panel">
 
-<h3>Pengaturan</h3>
+<h3>Tabel Energi</h3>
 
-<p>
-Massa: <span id="massValue">2</span> kg
-</p>
+<table>
+<tr>
+<th>Jenis Energi</th>
+<th>Nilai</th>
+</tr>
 
-<input type="range" id="mass" min="1" max="10" value="2">
+<tr>
+<td>Energi Potensial</td>
+<td id="ep">200 J</td>
+</tr>
 
-<p>
-Ketinggian: <span id="heightValue">10</span> m
-</p>
+<tr>
+<td>Energi Kinetik</td>
+<td id="ek">0 J</td>
+</tr>
 
-<input type="range" id="height" min="5" max="20" value="10">
+<tr>
+<td>Energi Mekanik</td>
+<td id="em">200 J</td>
+</tr>
 
-<br><br>
+</table>
 
-<button onclick="startFall()">
-🍎 Jatuhkan Apel
-</button>
+<div class="explain" id="explain">
 
-<hr>
+💡 Apel berada di atas pohon.
 
-<h3>Energi Potensial</h3>
-
-<div class="bar">
-<div class="fill ep" id="epBar"></div>
-</div>
-
-<p id="epText">0 J</p>
-
-<h3>Energi Kinetik</h3>
-
-<div class="bar">
-<div class="fill ek" id="ekBar"></div>
-</div>
-
-<p id="ekText">0 J</p>
-
-<hr>
-
-<h3>Energi Mekanik</h3>
-
-<p id="emText">0 J</p>
+Energi potensial maksimum karena ketinggiannya paling besar.
 
 </div>
 
@@ -161,70 +217,140 @@ Ketinggian: <span id="heightValue">10</span> m
 
 <script>
 
-const apple = document.getElementById("apple");
+const apple=document.getElementById("apple");
 
-const massSlider = document.getElementById("mass");
-const heightSlider = document.getElementById("height");
+const epText=document.getElementById("ep");
+const ekText=document.getElementById("ek");
+const emText=document.getElementById("em");
 
-const massValue = document.getElementById("massValue");
-const heightValue = document.getElementById("heightValue");
+const statusText=document.getElementById("status");
+const explainText=document.getElementById("explain");
 
-const epText = document.getElementById("epText");
-const ekText = document.getElementById("ekText");
-const emText = document.getElementById("emText");
+const mass=document.getElementById("mass");
+const height=document.getElementById("height");
 
-const epBar = document.getElementById("epBar");
-const ekBar = document.getElementById("ekBar");
+const massLabel=document.getElementById("massLabel");
+const heightLabel=document.getElementById("heightLabel");
 
-massSlider.oninput = () => {
-    massValue.innerText = massSlider.value;
-};
+mass.oninput=()=>massLabel.innerText=mass.value;
+height.oninput=()=>heightLabel.innerText=height.value;
 
-heightSlider.oninput = () => {
-    heightValue.innerText = heightSlider.value;
-};
+let pos=0;
+let timer=null;
 
-function startFall(){
+function updateEnergy(){
 
-    let m = parseFloat(massSlider.value);
-    let h = parseFloat(heightSlider.value);
+let m=parseFloat(mass.value);
+let h=parseFloat(height.value);
 
-    let g = 10;
+let total=m*10*h;
 
-    let totalEnergy = m * g * h;
+let ratio=pos/350;
 
-    let pos = 0;
-    let maxPos = 350;
+if(ratio>1) ratio=1;
 
-    apple.style.top = "50px";
+let ep=total*(1-ratio);
+let ek=total-ep;
 
-    let animation = setInterval(() => {
+epText.innerHTML=ep.toFixed(1)+" J";
+ekText.innerHTML=ek.toFixed(1)+" J";
+emText.innerHTML=total.toFixed(1)+" J";
 
-        pos += 4;
+if(ratio<0.3){
 
-        let ratio = pos / maxPos;
+statusText.innerHTML="Posisi: Atas";
 
-        if(ratio > 1) ratio = 1;
-
-        let ep = totalEnergy * (1 - ratio);
-        let ek = totalEnergy - ep;
-
-        epText.innerHTML = ep.toFixed(1) + " J";
-        ekText.innerHTML = ek.toFixed(1) + " J";
-        emText.innerHTML = totalEnergy.toFixed(1) + " J";
-
-        epBar.style.width = (ep/totalEnergy*100) + "%";
-        ekBar.style.width = (ek/totalEnergy*100) + "%";
-
-        apple.style.top = (50 + pos) + "px";
-
-        if(pos >= maxPos){
-            clearInterval(animation);
-        }
-
-    },30);
+explainText.innerHTML=
+"💡 Energi potensial sangat besar karena apel masih berada di ketinggian.";
 
 }
+
+else if(ratio<0.7){
+
+statusText.innerHTML="Posisi: Tengah";
+
+explainText.innerHTML=
+"💡 Energi potensial berkurang dan energi kinetik bertambah karena apel mulai bergerak lebih cepat.";
+
+}
+
+else{
+
+statusText.innerHTML="Posisi: Bawah";
+
+explainText.innerHTML=
+"💡 Energi kinetik hampir maksimum. Energi potensial hampir habis berubah menjadi energi kinetik.";
+
+}
+
+}
+
+function playSim(){
+
+if(timer) return;
+
+timer=setInterval(()=>{
+
+pos+=4;
+
+if(pos>=350){
+
+pos=350;
+
+clearInterval(timer);
+
+timer=null;
+
+}
+
+apple.style.top=(50+pos)+"px";
+
+updateEnergy();
+
+},30);
+
+}
+
+function pauseSim(){
+
+clearInterval(timer);
+
+timer=null;
+
+}
+
+function resetSim(){
+
+clearInterval(timer);
+
+timer=null;
+
+pos=0;
+
+apple.style.top="50px";
+
+updateEnergy();
+
+}
+
+function stepSim(){
+
+if(pos<350){
+
+pos+=40;
+
+if(pos>350) pos=350;
+
+apple.style.top=(50+pos)+"px";
+
+updateEnergy();
+
+}
+
+}
+
+updateEnergy();
+
 </script>
 
 </body>
